@@ -4,3 +4,4 @@ elevation.xml
 *.svg
 *.tif
 *.geojson
+*.gcode

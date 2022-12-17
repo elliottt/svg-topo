@@ -1,0 +1,46 @@
+[gwrite.plotter]
+unit = "mm"
+invert_y = true
+
+document_start = """
+(Start Document)
+G21       ; millimeters
+G90       ; absolute positioning
+M03 S0    ; raise the pen
+"""
+
+document_end = """
+(End Document)
+M3 S0     ; raise the pen
+G4 P0.1   ; delay by 0.1 s to wait for the pen to lift
+G0 X0 Y0  ; return to the origin
+M2        ; end
+"""
+
+layer_start = """
+(Start Layer)
+"""
+
+layer_end = """
+(End Layer)
+"""
+
+line_start = """
+(Start Line)
+"""
+
+line_end = """
+(End Line)
+M3 S0     ; pen up
+G4 P0.1   ; delay by 0.1 s to wait for the pen to lift
+"""
+
+segment_first = """
+G0 X{x} Y{y}
+M3 S30    ; pen down
+G4 P0.1   ; delay by 0.1s
+"""
+
+segment = """
+G1 X{x} Y{y} F3000 ; feedrate 3000
+"""

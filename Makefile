@@ -21,6 +21,12 @@ all:: $1-contour.svg
 endef
 
 $(eval $(call region,sedona,-111.8045048788,34.8261744768,-111.7832188681,34.8122931961))
+$(eval $(call region,elden,-111.642112,35.260701,-111.5913,35.227895))
+$(eval $(call region,hart,-111.792175,35.376128,-111.712953,35.317111))
+
+WIDTH ?= 1000
+HEIGHT ?= 1000
+SCALE ?= 0.66
 
 %-shaded.tif: %.tif
 	gdaldem hillshade -az 75 -z 8 $< $@
@@ -33,11 +39,19 @@ $(eval $(call region,sedona,-111.8045048788,34.8261744768,-111.7832188681,34.812
 
 %-contour-resized.geojson: %-contour.geojson | node_modules
 	npm exec geoproject -- \
-		'd3.geoMercator().fitSize([1000, 1000], d)' \
+		'd3.geoMercator().fitSize([$(WIDTH), $(HEIGHT)], d)' \
 		--out $@ < $<
 
 %-contour.svg: %-contour-resized.geojson | node_modules
-	npm exec geo2svg -- -w 1000 -h 1000 -o $@ < $<
+	npm exec geo2svg -- -w $(WIDTH) -h $(HEIGHT) -o $@ < $<
+
+%-contour.gcode: %-contour.svg vpype.toml
+	vpype --config vpype.toml \
+		read $< \
+		linesort \
+		linemerge \
+		scale -o 0 0 $(SCALE) $(SCALE) \
+		gwrite -p plotter $@
 
 clean:
 	$(RM) *.tif *.svg *.geojson
