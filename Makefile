@@ -1,15 +1,26 @@
 
+.PHONY: all
+all::
+
 node_modules: package.json
 	npm install
 
 elevation.xml:
 	wget https://gist.githubusercontent.com/crofty/eee53338259b1399b38022ec63f001a4/raw/de5dd0da82de27d63415d4d405acdfa853734399/elevation.xml
 
-sedona.tif: elevation.xml
+define region
+
+$1.tif: elevation.xml
 	gdal_translate \
 	  -of GTiff \
-	  -projwin -111.8045048788 34.8261744768 -111.7832188681 34.8122931961 \
-	  -projwin_srs EPSG:4326 $< $@
+	  -projwin $2 $3 $4 $5 \
+	  -projwin_srs EPSG:4326 $$< $$@
+
+all:: $1-contour.svg
+
+endef
+
+$(eval $(call region,sedona,-111.8045048788,34.8261744768,-111.7832188681,34.8122931961))
 
 %-shaded.tif: %.tif
 	gdaldem hillshade -az 75 -z 8 $< $@
