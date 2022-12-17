@@ -1,5 +1,6 @@
 node_modules/
 gdalwmscache/
+elevation.xml
 *.svg
 *.tif
 *.geojson
