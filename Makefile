@@ -27,20 +27,17 @@ $1-contour.geojson: INTERVAL=$2
 $1.gcode: $1-contour-welded.gcode
 	cp $$< $$@
 
+$1.svg: $1-contour.svg
+	cp $$< $$@
+
 .PHONY: $1
-$1: $1-contour.svg $1.gcode
+$1: $1.svg $1.gcode
 
 all:: $1
 
 endef
 
-$(eval $(call region,sedona,10,-111.8079103566,34.8342684252,-111.7841781713,34.8094661179))
-$(eval $(call region,elden,25,-111.662406715,35.2961095392,-111.5710828624,35.2012021915))
-$(eval $(call region,hart,25,-111.8000362239,35.3895397366,-111.6750667415,35.2634917447))
-
-WIDTH ?= 700
-HEIGHT ?= 1000
-SCALE ?= 0.66
+include regions.mk
 
 %-shaded.tif: %.tif
 	gdaldem hillshade -az 75 -z 8 $< $@
