@@ -1,6 +1,7 @@
 node_modules/
 gdalwmscache/
 elevation.xml
+arc_welder/
 *.svg
 *.tif
 *.geojson
