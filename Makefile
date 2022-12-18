@@ -69,7 +69,7 @@ include regions.mk
 	arc_welder/bin/ArcWelder $< $@
 
 clean:
-	$(RM) *.tif *.svg *.geojson
+	$(RM) *.tif *.svg *.geojson *.gcode
 
 distclean: clean
 	$(RM) elevation.xml
