@@ -2,6 +2,10 @@
 .PHONY: all
 all::
 
+pipx:
+	PIPX_HOME=pipx PIPX_BIN_DIR=pipx/bin pipx install vpype
+	PIPX_HOME=pipx PIPX_BIN_DIR=pipx/bin pipx inject vpype vpype-gcode
+
 node_modules: package.json
 	npm install
 
@@ -24,7 +28,10 @@ $1.tif: elevation.xml
 
 $1-contour.geojson: INTERVAL=$2
 
-$1.gcode: $1-contour-welded.gcode
+# $1.gcode: $1-contour-welded.gcode
+# 	cp $$< $$@
+
+$1.gcode: $1-contour.gcode
 	cp $$< $$@
 
 $1.svg: $1-contour.svg
@@ -56,14 +63,13 @@ include regions.mk
 %-contour.svg: %-contour-resized.geojson | node_modules
 	npm exec geo2svg -- -w $(WIDTH) -h $(HEIGHT) -o $@ < $<
 
-%-contour.gcode: %-contour.svg vpype.toml | arc_welder
-	vpype --config vpype.toml \
+%-contour.gcode: %-contour.svg vpype.toml | pipx
+	./pipx/bin/vpype --config vpype.toml \
 		read $< \
 		linesort \
 		linemerge \
 		scale -o 0 0 $(SCALE) $(SCALE) \
 		gwrite -p plotter $@
-	arc_welder/bin/ArcWelder $@ $@
 
 %-welded.gcode: %.gcode
 	arc_welder/bin/ArcWelder $< $@
@@ -76,3 +82,4 @@ distclean: clean
 	$(RM) -r node_modules
 	$(RM) -r gdalwmscache
 	$(RM) -r arc_welder
+	$(RM) -r pipx
