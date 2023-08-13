@@ -1,7 +1,7 @@
 
 # svg topo helper
 
-This is a Makefile for helping out with generating svg contour maps.
+This is a Makefile for helping out with generating svg and gcode contour maps.
 
 ## Requirements
 
@@ -9,8 +9,15 @@ You'll need a few tools installed, and the others will be installed on-demand by
 the makefile:
 
 * gdal - can be installed via homebrew
-* npm
-* vpype - for producing gcode
+* nodejs 20
+* pipx
+* unzip
+* python3
+* gnu make
+
+If you're using nix, there's a `shell.nix` that replicates the environment
+needed to produce maps, otherwise you'll need to ensure those dependencies are
+present.
 
 Producing gcode will automatically download and install arc-welder locally, as
 the resulting gcode has an awful lot of straight line segments that form curves
@@ -18,10 +25,22 @@ in the output.
 
 ## Usage
 
-Modify the `regions.mk` file according to the comments to define new regions,
-then use `make <region>` to produce svg and gcode from it. If you'd like to only
-produce one of those outputs, you can use the `<region.svg` or `<region>.gcode`
-targets directly.
+The `projection.js` script creates a makefile that will produce svg and gcode
+versions of a topographic map from the region specified, with the given contour
+interval. Run:
+
+```shell
+$ node projection.js <region> <contour-interval> <lon> <lat> <width-km> <height-km> <width-px> <height-px>
+```
+
+To produce a makefile called `<region>.mk`. Then run:
+
+```shell
+$ make -f <region>.mk
+```
+
+to produce two files in the current directory named `<region>.svg` and
+`<region>.gcode`.
 
 ## References
 
