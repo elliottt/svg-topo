@@ -46,8 +46,10 @@ build/elevation.xml: | build
 		linemerge \
 		gwrite -p plotter $@
 
+# Awful hack to work around nix issues with the libc that gets patched in by
+# shell.nix
 %-welded.gcode: %.gcode
-	./build/arc_welder/bin/ArcWelder $< $@
+	LD_LIBRARY_PATH= ./build/arc_welder/bin/ArcWelder $< $@
 
 distclean: clean
 	$(RM) -rf build

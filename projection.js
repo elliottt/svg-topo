@@ -59,7 +59,7 @@ build/maps/${region}/${region}.tif: build/elevation.xml | build/maps/${region}
 
 build/maps/${region}/${region}-contour.geojson: INTERVAL=${contour_meters}
 
-${region}.gcode: build/maps/${region}/${region}-contour.gcode
+${region}.gcode: build/maps/${region}/${region}-contour-welded.gcode
 	cp $< $@
 
 build/maps/${region}/${region}.svg: WIDTH=${width_px}
