@@ -1,4 +1,6 @@
 {
+  "main": "projection.js",
+  "type": "module",
   "dependencies": {
     "d3-geo-projection": "^4.0.0"
   }

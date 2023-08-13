@@ -1,7 +1,4 @@
 
-.PHONY: all
-all::
-
 pipx:
 	PIPX_HOME=pipx PIPX_BIN_DIR=pipx/bin pipx install vpype
 	PIPX_HOME=pipx PIPX_BIN_DIR=pipx/bin pipx inject vpype vpype-gcode
@@ -17,34 +14,6 @@ arc_welder:
 
 elevation.xml:
 	wget https://gist.githubusercontent.com/crofty/eee53338259b1399b38022ec63f001a4/raw/de5dd0da82de27d63415d4d405acdfa853734399/elevation.xml
-
-define region
-
-$1.tif: elevation.xml
-	gdal_translate \
-	  -of GTiff \
-	  -projwin $3 $4 $5 $6 \
-	  -projwin_srs EPSG:4326 $$< $$@
-
-$1-contour.geojson: INTERVAL=$2
-
-# $1.gcode: $1-contour-welded.gcode
-# 	cp $$< $$@
-
-$1.gcode: $1-contour.gcode
-	cp $$< $$@
-
-$1.svg: $1-contour.svg
-	cp $$< $$@
-
-.PHONY: $1
-$1: $1.svg $1.gcode
-
-all:: $1
-
-endef
-
-include regions.mk
 
 %-shaded.tif: %.tif
 	gdaldem hillshade -az 75 -z 8 $< $@
@@ -68,7 +37,6 @@ include regions.mk
 		read $< \
 		linesort \
 		linemerge \
-		scale -o 0 0 $(SCALE) $(SCALE) \
 		gwrite -p plotter $@
 
 %-welded.gcode: %.gcode
