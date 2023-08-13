@@ -43,20 +43,31 @@ async function main() {
 .PHONY: all
 all: ${region}.svg ${region}.gcode
 
-${region}.tif: elevation.xml
+clean:
+	$(RM) -r build/maps/${region}
+	$(RM) -f ${region}.svg
+	$(RM) -f ${region}.gcode
+
+build/maps/${region}: | build/maps
+	mkdir $@
+
+build/maps/${region}/${region}.tif: build/elevation.xml | build/maps/${region}
 	gdal_translate \\
 	  -of GTiff \\
 	  -projwin ${lng_min} ${lat_max} ${lng_max} ${lat_min} \\
 	  -projwin_srs EPSG:4326 $< $@
 
-${region}-contour.geojson: INTERVAL=${contour_meters}
+build/maps/${region}/${region}-contour.geojson: INTERVAL=${contour_meters}
 
-${region}.gcode: ${region}-contour.gcode
+${region}.gcode: build/maps/${region}/${region}-contour.gcode
 	cp $< $@
 
-${region}.svg: WIDTH=${width_px}
-${region}.svg: HEIGHT=${height_px}
-${region}.svg: ${region}-contour.svg
+build/maps/${region}/${region}.svg: WIDTH=${width_px}
+build/maps/${region}/${region}.svg: HEIGHT=${height_px}
+build/maps/${region}/${region}.svg: build/maps/${region}/${region}-contour.svg
+	cp $< $@
+
+${region}.svg: build/maps/${region}/${region}.svg
 	cp $< $@
 
 include mk/topo.mk

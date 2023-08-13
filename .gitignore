@@ -7,4 +7,4 @@ pipx/
 *.tif
 *.geojson
 *.gcode
-*.mk
+/*.mk

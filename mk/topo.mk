@@ -1,19 +1,26 @@
 
-pipx:
-	PIPX_HOME=pipx PIPX_BIN_DIR=pipx/bin pipx install vpype
-	PIPX_HOME=pipx PIPX_BIN_DIR=pipx/bin pipx inject vpype vpype-gcode
+build:
+	mkdir $@
+
+build/maps: | build
+	mkdir $@
+
+build/pipx: | build
+	PIPX_HOME=$@ PIPX_BIN_DIR=build/pipx/bin pipx install vpype
+	PIPX_HOME=$@ PIPX_BIN_DIR=build/pipx/bin pipx inject vpype vpype-gcode
 
 node_modules: package.json
 	npm install
 
-arc_welder:
+build/arc_welder: | build
 	mkdir $@
 	cd $@ && \
 		wget https://github.com/FormerLurker/ArcWelderLib/releases/download/1.2.0/Linux.zip && \
 		unzip Linux.zip
 
-elevation.xml:
-	wget https://gist.githubusercontent.com/crofty/eee53338259b1399b38022ec63f001a4/raw/de5dd0da82de27d63415d4d405acdfa853734399/elevation.xml
+build/elevation.xml: | build
+	cd build && \
+	  wget https://gist.githubusercontent.com/crofty/eee53338259b1399b38022ec63f001a4/raw/de5dd0da82de27d63415d4d405acdfa853734399/elevation.xml
 
 %-shaded.tif: %.tif
 	gdaldem hillshade -az 75 -z 8 $< $@
@@ -32,22 +39,17 @@ elevation.xml:
 %-contour.svg: %-contour-resized.geojson | node_modules
 	npm exec geo2svg -- -w $(WIDTH) -h $(HEIGHT) -o $@ < $<
 
-%-contour.gcode: %-contour.svg vpype.toml | pipx
-	./pipx/bin/vpype --config vpype.toml \
+%-contour.gcode: %-contour.svg vpype.toml | build/pipx
+	./build/pipx/bin/vpype --config vpype.toml \
 		read $< \
 		linesort \
 		linemerge \
 		gwrite -p plotter $@
 
 %-welded.gcode: %.gcode
-	arc_welder/bin/ArcWelder $< $@
-
-clean:
-	$(RM) *.tif *.svg *.geojson *.gcode
+	./build/arc_welder/bin/ArcWelder $< $@
 
 distclean: clean
-	$(RM) elevation.xml
+	$(RM) -rf build
 	$(RM) -r node_modules
 	$(RM) -r gdalwmscache
-	$(RM) -r arc_welder
-	$(RM) -r pipx
