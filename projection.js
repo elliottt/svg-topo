@@ -12,12 +12,12 @@ function rad2deg(rad) {
 async function main() {
   let args = process.argv.slice(2);
 
-  if (args.length != 8) {
-    console.error("Usage: node process.js region contour-meters lat-center lon-center width-km height-km width-px height-px");
+  if (args.length != 7) {
+    console.error("Usage: node process.js region contour-meters lat-center lon-center width-km height-km width-mm");
     process.exit(1);
   }
 
-  let [region, contour_meters, lng, lat, width, height, width_px, height_px] = args;
+  let [region, contour_meters, lng, lat, width, height, width_mm] = args;
 
   // TODO: assert bounds for lng and lat
 
@@ -38,6 +38,19 @@ async function main() {
   const lat_min = rad2deg(lat - height_2);
   const lng_max = rad2deg(lng + width_2);
   const lat_max = rad2deg(lat + height_2);
+
+  let mm_per_px = 0.26458333;
+  let px_per_mm = 1 / mm_per_px;
+  let base_px = width_mm * px_per_mm;
+
+  let width_px = base_px;
+  let height_px = base_px;
+
+  if (width > height) {
+    height_px = height_px * (height / width);
+  } else if (height > width) {
+    width_px = width_px * (width / height);
+  }
 
   await fs.writeFile(`${region}.mk`, `
 .PHONY: all
