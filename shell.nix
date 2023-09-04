@@ -10,7 +10,8 @@ pkgs.mkShell {
     pkgs.pipx
   ];
 
-  shellHook = ''
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib}/lib"
-  '';
+  LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+    pkgs.stdenv.cc.cc.lib
+    pkgs.zlib
+  ];
 }
