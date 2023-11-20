@@ -41,14 +41,21 @@ build/elevation.xml: | build
 
 %-contour.gcode: %-contour.svg vpype.toml | build/pipx
 	./build/pipx/bin/vpype --config vpype.toml \
-		read $< \
+		read -m -l new $<  \
 		linesort \
 		linemerge \
+		reloop \
+		frame -l new \
+		lswap 1 2 \
+		frame -l new \
+		propset -l 1 --type int strength 0 \
+		propset -l 1 --type str stop "M0" \
+		write $@.svg \
 		gwrite -p plotter $@
 
 # Awful hack to work around nix issues with the libc that gets patched in by
 # shell.nix
-%-welded.gcode: %.gcode
+%-welded.gcode: %.gcode | build/arc_welder
 	LD_LIBRARY_PATH= ./build/arc_welder/bin/ArcWelder $< $@
 
 distclean: clean

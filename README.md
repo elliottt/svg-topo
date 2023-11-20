@@ -30,7 +30,7 @@ versions of a topographic map from the region specified, with the given contour
 interval. Run:
 
 ```shell
-$ node projection.js <region> <contour-interval> <lon> <lat> <width-km> <height-km> <width-px> <height-px>
+$ node projection.js <region> <contour-interval> <lon> <lat> <width-km> <height-km> <out-width-mm>
 ```
 
 To produce a makefile called `<region>.mk`. Then run:

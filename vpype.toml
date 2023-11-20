@@ -1,4 +1,5 @@
 [gwrite.plotter]
+default_values = { strength = 30, stop = "" }
 unit = "mm"
 invert_y = true
 
@@ -23,6 +24,7 @@ layer_start = """
 
 layer_end = """
 (End Layer)
+{stop} ; stop
 """
 
 line_start = """
@@ -37,8 +39,8 @@ G4 P0.1   ; delay by 0.1 s to wait for the pen to lift
 
 segment_first = """
 G0 X{x} Y{y}
-M3 S30    ; pen down
-G4 P0.1   ; delay by 0.1s
+M3 S{strength}  ; pen down
+G4 P0.1         ; delay by 0.1s
 """
 
 segment = """
