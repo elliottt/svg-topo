@@ -15,7 +15,7 @@ the makefile:
 * python3
 * gnu make
 
-If you're using nix, there's a `shell.nix` that replicates the environment
+If you're using nix, there's a `flake.nix` that replicates the environment
 needed to produce maps, otherwise you'll need to ensure those dependencies are
 present.
 
