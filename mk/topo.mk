@@ -12,12 +12,6 @@ build/pipx: | build
 node_modules: package.json
 	npm install
 
-build/arc_welder: | build
-	mkdir $@
-	cd $@ && \
-		wget https://github.com/FormerLurker/ArcWelderLib/releases/download/1.2.0/Linux.zip && \
-		unzip Linux.zip
-
 build/elevation.xml: | build
 	cd build && \
 	  wget https://gist.githubusercontent.com/crofty/eee53338259b1399b38022ec63f001a4/raw/de5dd0da82de27d63415d4d405acdfa853734399/elevation.xml
@@ -53,10 +47,8 @@ build/elevation.xml: | build
 		write $@.svg \
 		gwrite -p plotter $@
 
-# Awful hack to work around nix issues with the libc that gets patched in by
-# shell.nix
-%-welded.gcode: %.gcode | build/arc_welder
-	LD_LIBRARY_PATH= ./build/arc_welder/bin/ArcWelder $< $@
+%-welded.gcode: %.gcode
+	ArcWelder $< $@
 
 distclean: clean
 	$(RM) -rf build
