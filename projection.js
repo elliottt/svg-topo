@@ -39,12 +39,11 @@ async function main() {
   const lng_max = rad2deg(lng + width_2);
   const lat_max = rad2deg(lat + height_2);
 
-  let mm_per_px = 0.26458333;
-  let px_per_mm = 1 / mm_per_px;
-  let base_px = width_mm * px_per_mm;
-
-  let width_px = base_px;
-  let height_px = base_px;
+  // Okay, this is gross. Treat pixels and mm as the same thing for the purposes
+  // of producing the initial svg, as vpype can make the conversion back to mm
+  // when producing the gcode.
+  let width_px = width_mm;
+  let height_px = width_mm;
 
   if (width > height) {
     height_px = height_px * (height / width);
@@ -54,7 +53,14 @@ async function main() {
 
   await fs.writeFile(`${region}.mk`, `
 .PHONY: all
-all: ${region}.svg ${region}.gcode
+all: ${region}.svg ${region}-gcode.svg ${region}.gcode
+
+WIDTH := ${width_px}
+HEIGHT := ${height_px}
+INTERVAL := ${contour_meters}
+
+LAT_MIN := ${lat_min}
+LAT_MAX := ${lat_max}
 
 clean:
 	$(RM) -r build/maps/${region}
@@ -66,21 +72,23 @@ build/maps/${region}: | build/maps
 
 build/maps/${region}/${region}.tif: build/elevation.xml | build/maps/${region}
 	gdal_translate \\
+	  -r average \\
 	  -of GTiff \\
 	  -projwin ${lng_min} ${lat_max} ${lng_max} ${lat_min} \\
 	  -projwin_srs EPSG:4326 $< $@
 
-build/maps/${region}/${region}-contour.geojson: INTERVAL=${contour_meters}
+build/maps/${region}/${region}-contour.geojson: 
 
 ${region}.gcode: build/maps/${region}/${region}-contour-welded.gcode
 	cp $< $@
 
-build/maps/${region}/${region}.svg: WIDTH=${width_px}
-build/maps/${region}/${region}.svg: HEIGHT=${height_px}
 build/maps/${region}/${region}.svg: build/maps/${region}/${region}-contour.svg
 	cp $< $@
 
 ${region}.svg: build/maps/${region}/${region}.svg
+	cp $< $@
+
+${region}-gcode.svg: build/maps/${region}/${region}-contour.gcode.svg
 	cp $< $@
 
 include mk/topo.mk

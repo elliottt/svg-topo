@@ -1,6 +1,6 @@
 [gwrite.plotter]
 default_values = { strength = 30, stop = "" }
-unit = "mm"
+unit = "px"
 invert_y = true
 
 document_start = """

@@ -33,15 +33,17 @@ build/elevation.xml: | build
 %-contour.svg: %-contour-resized.geojson | node_modules
 	npm exec geo2svg -- -w $(WIDTH) -h $(HEIGHT) -o $@ < $<
 
+%-contour.gcode.svg: %-contour.gcode ;
+
 %-contour.gcode: %-contour.svg vpype.toml | build/pipx
 	./build/pipx/bin/vpype --config vpype.toml \
-		read -m -l new $<  \
+		read --single-layer --layer new $<  \
+		rect -l new 0 0 $(WIDTH) $(WIDTH) \
 		linesort \
 		linemerge \
 		reloop \
-		frame -l new \
 		lswap 1 2 \
-		frame -l new \
+		rect -l new 0 0 $(WIDTH) $(WIDTH) \
 		propset -l 1 --type int strength 0 \
 		propset -l 1 --type str stop "M0" \
 		write $@.svg \
