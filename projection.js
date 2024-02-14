@@ -74,6 +74,7 @@ build/maps/${region}/${region}.tif: build/elevation.xml | build/maps/${region}
 	gdal_translate \\
 	  -r average \\
 	  -of GTiff \\
+	  -outsize $(WIDTH) $(HEIGHT) \\
 	  -projwin ${lng_min} ${lat_max} ${lng_max} ${lat_min} \\
 	  -projwin_srs EPSG:4326 $< $@
 

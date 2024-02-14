@@ -38,14 +38,13 @@ build/elevation.xml: | build
 %-contour.gcode: %-contour.svg vpype.toml | build/pipx
 	./build/pipx/bin/vpype --config vpype.toml \
 		read --single-layer --layer new $<  \
-		rect -l new 0 0 $(WIDTH) $(WIDTH) \
 		linesort \
 		linemerge \
 		reloop \
+		frame -l new \
+		propset -l 2 --type int strength 0 \
+		propset -l 2 --type str stop "M0" \
 		lswap 1 2 \
-		rect -l new 0 0 $(WIDTH) $(WIDTH) \
-		propset -l 1 --type int strength 0 \
-		propset -l 1 --type str stop "M0" \
 		write $@.svg \
 		gwrite -p plotter $@
 
